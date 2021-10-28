@@ -10,6 +10,7 @@ ob_start();
 
 if ($user) {
     login($email, $password);
+    redirect_to();
 }else{
     set_flash_message('login_error', 'Такой пользователь не найден');
     redirect_to('page_login.php');

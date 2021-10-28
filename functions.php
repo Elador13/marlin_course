@@ -61,8 +61,6 @@ function redirect_to($path)
 
 function login($email, $password)
 {
-    $connect = db_connect();
-
     $user = get_user_by_email($email);
     if (!$user) {
         return false;
@@ -70,6 +68,12 @@ function login($email, $password)
 
     if (password_verify($password, $user['password'])) {
         set_flash_message('login_success', 'Авторизация успешна');
+
+        $_SESSION['user'] = [
+            'id' => $user['user_id'],
+            'email' => $email
+        ];
+
         redirect_to('users.html');
     }else{
         set_flash_message('login_error', 'Пароль не верный');
