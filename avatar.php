@@ -18,7 +18,10 @@ if(isset($_FILES['avatar'])) {
         // загружаем изображение на сервер предварительно удалив существующее из БД и хранилища
         $connect = db_connect();
         $sql = "UPDATE users SET avatar = NULL WHERE user_id = '$id'";
-        unlink('img/'. $old_avatar);
+
+        if (file_exists('img/' . $old_avatar)) {
+            unlink('img/'. $old_avatar);
+        }
 
         $name = mt_rand(0, 10000) . $file['name'];
         copy($file['tmp_name'], 'img/' . $name);
