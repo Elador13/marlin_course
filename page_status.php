@@ -1,3 +1,9 @@
+<?php
+ob_start();
+include 'functions.php';
+session_start();
+$id = $_GET['id']
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -38,7 +44,7 @@
             </h1>
 
         </div>
-        <form action="">
+        <form action="status.php?<?php echo 'id=' . $id?>" method="post">
             <div class="row">
                 <div class="col-xl-6">
                     <div id="panel-1" class="panel">
@@ -52,7 +58,7 @@
                                         <!-- status -->
                                         <div class="form-group">
                                             <label class="form-label" for="example-select">Выберите статус</label>
-                                            <select class="form-control" id="example-select">
+                                            <select name="status" class="form-control" id="example-select">
                                                 <option>Онлайн</option>
                                                 <option>Отошел</option>
                                                 <option>Не беспокоить</option>

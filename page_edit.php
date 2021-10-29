@@ -1,3 +1,19 @@
+<?php
+ob_start();
+include 'functions.php';
+session_start();
+if (is_not_logged_in()) {
+    redirect_to('page_login.php');
+}
+//Чтобы обычный пользователь не мог редактировать других по id
+if (is_admin()) {
+    $user = get_user_by_id($_GET['id']);
+}else{
+    //Может редактировать только себя
+    $user = get_user_by_email($_SESSION['user']['email']);
+}
+
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -23,7 +39,7 @@
             </ul>
             <ul class="navbar-nav ml-auto">
                 <li class="nav-item">
-                    <a class="nav-link" href="page_login.html">Войти</a>
+                    <a class="nav-link" href="page_login.php">Войти</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="#">Выйти</a>
@@ -34,31 +50,44 @@
     <main id="js-page-content" role="main" class="page-content mt-3">
         <div class="subheader">
             <h1 class="subheader-title">
-                <i class='subheader-icon fal fa-image'></i> Загрузить аватар
+                <i class='subheader-icon fal fa-plus-circle'></i> Редактировать
             </h1>
 
         </div>
-        <form action="">
+        <form action="edit.php?<?php echo 'id=' . $_GET['id']?>" method="post">
             <div class="row">
                 <div class="col-xl-6">
                     <div id="panel-1" class="panel">
                         <div class="panel-container">
                             <div class="panel-hdr">
-                                <h2>Текущий аватар</h2>
+                                <h2>Общая информация</h2>
                             </div>
                             <div class="panel-content">
+                                <!-- username -->
                                 <div class="form-group">
-                                    <img src="img/demo/authors/josh.png" alt="" class="img-responsive" width="200">
+                                    <label class="form-label" for="simpleinput">Имя</label>
+                                    <input name="username" type="text" id="simpleinput" class="form-control" value="<?php echo $user['username'] ?>">
                                 </div>
 
+                                <!-- title -->
                                 <div class="form-group">
-                                    <label class="form-label" for="example-fileinput">Выберите аватар</label>
-                                    <input type="file" id="example-fileinput" class="form-control-file">
+                                    <label class="form-label" for="simpleinput">Место работы</label>
+                                    <input name="job" type="text" id="simpleinput" class="form-control" value="<?php echo $user['job'] ?>">
                                 </div>
 
+                                <!-- tel -->
+                                <div class="form-group">
+                                    <label class="form-label" for="simpleinput">Номер телефона</label>
+                                    <input name="tel" type="text" id="simpleinput" class="form-control" value="<?php echo $user['tel'] ?>">
+                                </div>
 
+                                <!-- address -->
+                                <div class="form-group">
+                                    <label class="form-label" for="simpleinput">Адрес</label>
+                                    <input name="address" type="text" id="simpleinput" class="form-control" value="<?php echo $user['address'] ?>">
+                                </div>
                                 <div class="col-md-12 mt-3 d-flex flex-row-reverse">
-                                    <button class="btn btn-warning">Загрузить</button>
+                                    <button class="btn btn-warning">Редактировать</button>
                                 </div>
                             </div>
                         </div>

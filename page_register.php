@@ -42,7 +42,7 @@ session_start();
                         <span class="text-white opacity-50 ml-auto mr-2 hidden-sm-down">
                             Уже зарегистрированы?
                         </span>
-                        <a href="page_login.html" class="btn-link text-white ml-auto ml-sm-0">
+                        <a href="page_login.php" class="btn-link text-white ml-auto ml-sm-0">
                             Войти
                         </a>
                     </div>
@@ -66,7 +66,7 @@ session_start();
 
                                     <?php if (isset($_SESSION['_flash']['user_exist'])): ?>
                                         <div class="alert alert-danger text-dark" role="alert">
-                                            <strong>Увдеомление! </strong><?php display_flash_message('user_exist'); ?>
+                                            <strong>Уведомление! </strong><?php display_flash_message('user_exist'); ?>
                                         </div>
                                     <?php endif ?>
 
