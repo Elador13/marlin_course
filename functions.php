@@ -173,19 +173,17 @@ function can_upload($file){
         redirect_to('page_users.php');
     }
 
-
     if($file['size'] == 0){
         set_flash_message('avatar_error', 'Файл слишком большой');
         redirect_to('page_users.php');
     }
 
     //Валидация расширения
-    $getMime = explode('.', $file['name']);
-    $mime = strtolower(end($getMime));
+    $extension = pathinfo($file['name'], PATHINFO_EXTENSION);
     $types = array('jpg', 'png', 'gif', 'bmp', 'jpeg');
 
     // если расширение не входит в список допустимых - return
-    if(!in_array($mime, $types))
+    if(!in_array($extension, $types))
         return 'Недопустимый тип файла.';
 
     return true;
