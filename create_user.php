@@ -5,17 +5,17 @@ session_start();
 
 $email = $_POST['email'];
 
-//Как вариант - сделать функцию для получения только email с базы, без остальных данных. Ускорит запрос
 if (get_user_by_email($email)) {
     set_flash_message('user_exist', 'Этот Email же занят!');
     redirect_to('page_create_user.php');
     return false;
 }
 
-$password = $_POST['password'];
-$hash = password_hash($password, PASSWORD_BCRYPT);
+$hash = password_hash($_POST['password'], PASSWORD_BCRYPT);
 
-$id = add_user($email, $hash);
+$role = $_POST['create_admin'] === 'on' ? 'admin' : 'user';
+
+$id = add_user($email, $hash, $role);
 
 $username = $_POST['username'];
 $job = $_POST['job'];
@@ -29,6 +29,8 @@ $instagram = $_POST['instagram'];
 edit_user_info($id, $username, $job, $tel, $address);
 
 set_status($id, $status);
+
+upload_avatar($id);
 
 edit_user_socials($id, $vk, $telegram, $instagram);
 

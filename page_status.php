@@ -3,7 +3,7 @@ ob_start();
 include 'functions.php';
 session_start();
 $id = $_GET['id'];
-if (($id !== $_SESSION['user']['id']) && !is_admin()) redirect_to('page_users.php');
+if (($id != $_SESSION['user']['id']) && !is_admin()) redirect_to('page_users.php');
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -45,7 +45,7 @@ if (($id !== $_SESSION['user']['id']) && !is_admin()) redirect_to('page_users.ph
                                             <label class="form-label" for="example-select">Выберите статус</label>
                                             <select name="status" class="form-control" id="example-select">
                                                 <option>Онлайн</option>
-                                                <option> >Отошел</option>
+                                                <option>Отошел</option>
                                                 <option>Не беспокоить</option>
                                             </select>
                                         </div>

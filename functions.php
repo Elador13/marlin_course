@@ -1,56 +1,42 @@
 <?php
-function db_connect()
-{
-    $connect = mysqli_connect("localhost", "root", "root", "marlin_course");
-    if (!$connect) {
-        die("Connection failed: " . mysqli_connect_error());
-    }
-    mysqli_set_charset($connect, "utf8");
-    return $connect;
-}
-
 function get_user_by_email($email)
 {
-    $connect = db_connect();
+    $pdo = new PDO('mysql:dbname=marlin_course;host=localhost;charset=utf8', 'root', 'root',
+        [PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC]);
 
-    $sql = "SELECT * FROM users WHERE email = '$email'";
-    $result = mysqli_query($connect, $sql);
+    $statement = $pdo->prepare("SELECT * FROM users WHERE email = ?");
+    $statement->execute(array($email));
 
+    $result = $statement->fetch();
     if (!$result) return false;
 
-    $data = mysqli_fetch_assoc($result);
-    $connect->close();
-    return $data;
-
+    return $result;
 }
 
 function get_user_by_id($id)
 {
-    $connect = db_connect();
+    $pdo = new PDO('mysql:dbname=marlin_course;host=localhost;charset=utf8', 'root', 'root',
+        [PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC]);
 
-    $sql = "SELECT * FROM users WHERE user_id = '$id'";
-    $result = mysqli_query($connect, $sql);
+    $statement = $pdo->prepare("SELECT * FROM users WHERE user_id = ?");
+    $statement->execute(array($id));
 
+    $result = $statement->fetch();
     if (!$result) return false;
 
-    $data = mysqli_fetch_assoc($result);
-    $connect->close();
-    return $data;
+    return $result;
 
 }
 
-function add_user($email, $password)
+function add_user($email, $password, $role = 'user')
 {
-    $connect = db_connect();
+    $pdo = new PDO('mysql:dbname=marlin_course;host=localhost;charset=utf8', 'root', 'root',
+        [PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC]);
 
-    $sql = "INSERT INTO users (email, password, role) VALUES ('$email', '$password', 'user')";
+    $statement = $pdo->prepare("INSERT INTO users (email, password, role) VALUES (?, ?, ?)");
+    $statement->execute(array($email, $password, $role));
 
-    mysqli_query($connect, $sql);
-
-    $user = get_user_by_email($email);
-    mysqli_close($connect);
-//    $connect->close();
-    return (int)$user['user_id'];
+    return $pdo->lastInsertId();
 }
 
 function set_flash_message($key, $message) {
@@ -98,32 +84,29 @@ function login($email, $password)
 
 function edit_user_info($id, $username = null, $job = null, $tel = null, $address = null)
 {
-    $connect = db_connect();
+    $pdo = new PDO('mysql:dbname=marlin_course;host=localhost;charset=utf8', 'root', 'root',
+        [PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC]);
 
-    $sql = "UPDATE users SET username = '$username', job = '$job', tel = '$tel', address = '$address' WHERE user_id = '$id'";
-
-    mysqli_query($connect, $sql);
-    $connect->close();
+    $statement = $pdo->prepare("UPDATE users SET username = ?, job = ?, tel = ?, address = ? WHERE user_id = ?");
+    $statement->execute(array($username, $job, $tel, $address, $id));
 }
 
 function set_status($id, $status = 'Онлайн')
 {
-    $connect = db_connect();
+    $pdo = new PDO('mysql:dbname=marlin_course;host=localhost;charset=utf8', 'root', 'root',
+        [PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC]);
 
-    $sql = "UPDATE users SET status = '$status' WHERE user_id = '$id'";
-
-    mysqli_query($connect, $sql);
-    $connect->close();
+    $statement = $pdo->prepare("UPDATE users SET status = ? WHERE user_id = ?");
+    $statement->execute(array($status, $id));
 }
 
-function edit_user_socials($id, $vk = null, $telegram = null, $instagram = null)
+function edit_user_socials($id, $vk, $telegram, $instagram)
 {
-    $connect = db_connect();
+    $pdo = new PDO('mysql:dbname=marlin_course;host=localhost;charset=utf8', 'root', 'root',
+        [PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC]);
 
-    $sql = "UPDATE users SET vk = '$vk', telegram = '$telegram', instagram = '$instagram' WHERE user_id = '$id'";
-
-    mysqli_query($connect, $sql);
-    $connect->close();
+    $statement = $pdo->prepare("UPDATE users SET vk = ?, telegram = ?, instagram = ? WHERE user_id = ?");
+    $statement->execute(array($vk, $telegram, $instagram, $id));
 }
 
 function is_not_logged_in()
@@ -144,11 +127,11 @@ function is_admin()
 
 function get_all_users()
 {
-    $connect = db_connect();
-    $sql = "SELECT * FROM users";
-    $result = mysqli_query($connect, $sql);
-    $connect->close();
-    return mysqli_fetch_all($result, MYSQLI_ASSOC);
+    $pdo = new PDO('mysql:dbname=marlin_course;host=localhost;charset=utf8', 'root', 'root',
+        [PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC]);
+
+    $statement = $pdo->query("SELECT * FROM users");
+    return $statement->fetchAll();
 }
 
 function get_status_class($status)
@@ -166,8 +149,8 @@ function get_status_class($status)
     }
 }
 
-
 function can_upload($file){
+
     if($file['name'] == ''){
         set_flash_message('avatar_error', 'Вы не выбрали аватар');
         redirect_to('page_users.php');
@@ -189,8 +172,39 @@ function can_upload($file){
     return true;
 }
 
-function make_upload($file){
-    //Уникальное имя аватара
-    $name = mt_rand(0, 10000) . $file['name'];
-    copy($file['tmp_name'], 'img/' . $name);
+function upload_avatar($id)
+{
+    if(!isset($_FILES['avatar'])) {
+        set_flash_message('avatar_error', 'Вы не выбрали изображение');
+        redirect_to('page_avatar.php' . "?id=$id");
+    }
+    // Проверка можно ли загружать изображение
+    $check = can_upload($_FILES['avatar']);
+    $file = $_FILES['avatar'];
+
+    if($check === true){
+        $old_avatar = get_user_by_id($id)['avatar'];
+        //Удаляю старый аватар из БД и хранилища
+        if (file_exists("/img/avatars/$old_avatar/")) {
+            unlink("/img/avatars/$old_avatar/");
+        }
+
+        $pdo = new PDO('mysql:dbname=marlin_course;host=localhost;charset=utf8', 'root', 'root',
+            [PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC]);
+        $statement = $pdo->prepare("UPDATE users SET avatar = NULL WHERE user_id = ?");
+        $statement->execute(array($id));
+        //Создаю имя файла
+        $extension = pathinfo($file['name'], PATHINFO_EXTENSION);
+        $name = uniqid() . '.' . $extension;
+        copy($file['tmp_name'], 'img/avatars/' . $name);
+
+        $statement = $pdo->prepare("UPDATE users SET avatar = ? WHERE user_id = ?");
+        $statement->execute(array($name, $id));
+
+        set_flash_message('edit_success', 'Данные пользователья успешно изменены');
+        return true;
+    }else{
+        set_flash_message('avatar_error', 'Не удалось загрузить аватар');
+        return false;
+    }
 }

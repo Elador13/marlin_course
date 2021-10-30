@@ -167,6 +167,10 @@ if (is_not_logged_in() || !is_admin()) {
                                             <input name="instagram" type="text" class="form-control border-left-0 bg-transparent pl-0">
                                         </div>
                                     </div>
+                                    <div class="custom-control custom-checkbox">
+                                        <input name="create_admin" type="checkbox" class="custom-control-input" id="create_admin">
+                                        <label class="custom-control-label" for="create_admin">Сделать Администратором?</label>
+                                    </div>
                                     <div class="col-md-12 mt-3 d-flex flex-row-reverse">
                                         <button class="btn btn-success">Добавить</button>
                                     </div>

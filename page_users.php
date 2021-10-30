@@ -89,7 +89,7 @@ $users = get_all_users()
                                         <a class="dropdown-item" href="page_edit.php?<?php echo 'id=' . $user['user_id']?>">
                                             <i class="fa fa-edit"></i>
                                         Редактировать</a>
-                                        <a class="dropdown-item" href="security.html">
+                                        <a class="dropdown-item" href="page_security.php?<?php echo 'id=' . $user['user_id']?>">
                                             <i class="fa fa-lock"></i>
                                         Безопасность</a>
                                         <a class="dropdown-item" href="page_status.php?<?php echo 'id=' . $user['user_id']?>">
