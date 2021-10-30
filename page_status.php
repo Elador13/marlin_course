@@ -1,6 +1,6 @@
 <?php
 ob_start();
-include 'functions.php';
+require_once 'functions.php';
 session_start();
 $id = $_GET['id'];
 if (($id != $_SESSION['user']['id']) && !is_admin()) redirect_to('page_users.php');

@@ -1,6 +1,6 @@
 <?php
 ob_start();
-include 'functions.php';
+require_once 'functions.php';
 session_start();
 if (is_not_logged_in() || !is_admin()) {
     set_flash_message('access_error', 'У Вас не прав доступа для этой операции!');

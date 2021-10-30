@@ -1,6 +1,6 @@
 <?php
 ob_start();
-include 'functions.php';
+require_once 'functions.php';
 session_start();
 
 $email = $_POST['email'];

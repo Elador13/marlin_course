@@ -1,7 +1,6 @@
 <?php
 session_start();
-include 'functions.php';
-
+require_once 'functions.php';
 
 $id = is_admin() ? $_SESSION['user']['id'] : $_GET['id'];
 $username = $_POST['username'];

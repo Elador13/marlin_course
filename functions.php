@@ -130,7 +130,7 @@ function get_all_users()
     $pdo = new PDO('mysql:dbname=marlin_course;host=localhost;charset=utf8', 'root', 'root',
         [PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC]);
 
-    $statement = $pdo->query("SELECT * FROM users");
+    $statement = $pdo->query("SELECT * FROM users ORDER BY user_id DESC");
     return $statement->fetchAll();
 }
 
