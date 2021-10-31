@@ -246,8 +246,8 @@ function upload_avatar($id)
     return false;
 }
 
-function is_author(int $logged_user_id, int $edit_user_id)
+function is_author($logged_user_id, $edit_user_id)
 {
-    if ($logged_user_id !== $edit_user_id) return false;
+    if ($logged_user_id != $edit_user_id) return false;
     return true;
 }

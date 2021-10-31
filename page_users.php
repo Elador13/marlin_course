@@ -76,13 +76,27 @@ $users = get_all_users()
                                     <span class="rounded-circle profile-image d-block " style="background-image:url('img/avatars/<?php echo $user['avatar'] ?>'); background-size: cover;"></span>
                                 </span>
                                 <div class="info-card-text flex-1">
-                                    <a href="javascript:void(0);" class="fs-xl text-truncate text-truncate-lg text-info" data-toggle="dropdown" aria-expanded="false">
-                                        <?php echo $user['username']?>
-                                        <?php if (is_admin() || ($user['user_id'] == $_SESSION['user']['id'])): ?>
-                                            <i class="fal fas fa-cog fa-fw d-inline-block ml-1 fs-md"></i>
-                                            <i class="fal fa-angle-down d-inline-block ml-1 fs-md"></i>
-                                        <?php endif; ?>
-                                    </a>
+
+                                    <?php if (!is_admin() && !is_author($_SESSION['user']['id'], $user['user_id'])): ?>
+                                        <a href="page_profile.php?id=<?php echo $user['user_id'] ?>" class="fs-xl text-truncate text-truncate-lg text-info"
+                                           aria-expanded="false">
+                                            <?php echo $user['username']?>
+                                            <?php if (is_admin() || ($user['user_id'] == $_SESSION['user']['id'])): ?>
+                                                <i class="fal fas fa-cog fa-fw d-inline-block ml-1 fs-md"></i>
+                                                <i class="fal fa-angle-down d-inline-block ml-1 fs-md"></i>
+                                            <?php endif; ?>
+                                        </a>
+                                    <?php else: ?>
+                                        <a href="javascript:void(0);" class="fs-xl text-truncate text-truncate-lg text-info"
+                                           data-toggle="dropdown"
+                                           aria-expanded="false">
+                                            <?php echo $user['username']?>
+                                            <?php if (is_admin() || ($user['user_id'] == $_SESSION['user']['id'])): ?>
+                                                <i class="fal fas fa-cog fa-fw d-inline-block ml-1 fs-md"></i>
+                                                <i class="fal fa-angle-down d-inline-block ml-1 fs-md"></i>
+                                            <?php endif; ?>
+                                        </a>
+                                    <?php endif; ?>
 
                                     <?php if (is_admin() || ($user['user_id'] == $_SESSION['user']['id'])): ?>
                                     <div class="dropdown-menu">
