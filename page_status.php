@@ -3,7 +3,10 @@ ob_start();
 require_once 'functions.php';
 session_start();
 $id = $_GET['id'];
-if (($id != $_SESSION['user']['id']) && !is_admin()) redirect_to('page_users.php');
+if (!is_author($_SESSION['user']['id'], $id) && !is_admin()) {
+    set_flash_message('access_error', 'Можно редактировать только свой профиль!');
+    redirect_to('page_users.php');
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">

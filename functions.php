@@ -100,6 +100,44 @@ function set_status($id, $status = 'Онлайн')
     $statement->execute(array($status, $id));
 }
 
+function edit_security($user_id, $email, $password, $password_confirmation)
+{
+    $user_id = $_GET['id'];
+    $email = $_POST['email'];
+    $password = $_POST['password'];
+
+    //1. Был лы изменен Имейл
+    $edit_user_email = get_user_by_id($user_id)['email'];
+    if ($email !== $edit_user_email) {
+        if (get_user_by_email($email)) {  //2. Не занят ли он другим
+            set_flash_message('security_error', 'Этот Email занят другим пользователем!');
+            redirect_to("page_security.php?id=$user_id");
+        }
+    }
+    //Если пароль не изменяли
+    if ($password === '') {
+        $pdo = new PDO('mysql:dbname=marlin_course;host=localhost;charset=utf8', 'root', 'root',
+            [PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC]);
+
+        $statement = $pdo->prepare("UPDATE users SET email = ? WHERE user_id = ?");
+        $statement->execute(array($email, $user_id));
+
+        set_flash_message('edit_success', 'Данные пользователья успешно изменены');
+        redirect_to('page_users.php');
+    }
+    //Если изменили и пароль и Имейл
+    $hash = password_hash($password, PASSWORD_BCRYPT);
+
+    $pdo = new PDO('mysql:dbname=marlin_course;host=localhost;charset=utf8', 'root', 'root',
+        [PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC]);
+
+    $statement = $pdo->prepare("UPDATE users SET email = ?, password = ? WHERE user_id = ?");
+    $statement->execute(array($email, $hash, $user_id));
+
+    set_flash_message('edit_success', 'Данные пользователья успешно изменены');
+    redirect_to('page_users.php');
+}
+
 function edit_user_socials($id, $vk, $telegram, $instagram)
 {
     $pdo = new PDO('mysql:dbname=marlin_course;host=localhost;charset=utf8', 'root', 'root',
@@ -189,22 +227,27 @@ function upload_avatar($id)
             unlink("/img/avatars/$old_avatar/");
         }
 
-        $pdo = new PDO('mysql:dbname=marlin_course;host=localhost;charset=utf8', 'root', 'root',
-            [PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC]);
-        $statement = $pdo->prepare("UPDATE users SET avatar = NULL WHERE user_id = ?");
-        $statement->execute(array($id));
-        //Создаю имя файла
+        //Создаю уникальное имя файла
         $extension = pathinfo($file['name'], PATHINFO_EXTENSION);
         $name = uniqid() . '.' . $extension;
-        copy($file['tmp_name'], 'img/avatars/' . $name);
 
+        $pdo = new PDO('mysql:dbname=marlin_course;host=localhost;charset=utf8', 'root', 'root',
+            [PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC]);
         $statement = $pdo->prepare("UPDATE users SET avatar = ? WHERE user_id = ?");
         $statement->execute(array($name, $id));
 
+        copy($file['tmp_name'], 'img/avatars/' . $name);
+
         set_flash_message('edit_success', 'Данные пользователья успешно изменены');
         return true;
-    }else{
-        set_flash_message('avatar_error', 'Не удалось загрузить аватар');
-        return false;
     }
+
+    set_flash_message('avatar_error', 'Не удалось загрузить аватар');
+    return false;
+}
+
+function is_author(int $logged_user_id, int $edit_user_id)
+{
+    if ($logged_user_id !== $edit_user_id) return false;
+    return true;
 }

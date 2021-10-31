@@ -5,7 +5,6 @@ require_once 'functions.php';
 $email = $_POST['email'];
 $password = $_POST['password'];
 
-//$user = get_user_by_email($email);
 $user = get_user_by_email($email);
 ob_start();
 

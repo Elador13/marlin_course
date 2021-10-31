@@ -4,7 +4,10 @@ require_once 'functions.php';
 session_start();
 if (is_not_logged_in()) redirect_to('page_login.php');
 $id = $_GET['id'];
-if (($id != $_SESSION['user']['id']) && !is_admin()) redirect_to('page_users.php');
+if (!is_author($_SESSION['user']['id'], $id) && !is_admin()) {
+    set_flash_message('access_error', 'Можно редактировать только свой профиль!');
+    redirect_to('page_users.php');
+}
 $user = get_user_by_id($id);
 ?>
 <!DOCTYPE html>
@@ -30,7 +33,7 @@ $user = get_user_by_id($id);
                 <i class='subheader-icon fal fa-lock'></i> Безопасность
             </h1>
 
-            <?php if (isset($_SESSION['_flash']['password_error'])): ?>
+            <?php if (isset($_SESSION['_flash']['security_error'])): ?>
                 <div class="alert alert-danger text-dark" role="alert">
                     <strong><?php display_flash_message('password_error'); ?></strong>
                 </div>

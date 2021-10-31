@@ -6,7 +6,10 @@ session_start();
 if (is_not_logged_in()) redirect_to('page_login.php');
 
 $id = $_GET['id'];
-if (($id != $_SESSION['user']['id']) && !is_admin()) redirect_to('page_users.php');
+if (!is_author($_SESSION['user']['id'], $id) && !is_admin()) {
+    set_flash_message('access_error', 'Можно редактировать только свой профиль!');
+    redirect_to('page_users.php');
+}
 
 $user = get_user_by_id($id);
 ?>
