@@ -7,6 +7,8 @@ if (!is_author($_SESSION['user']['id'], $id) && !is_admin()) {
     set_flash_message('access_error', 'Можно редактировать только свой профиль!');
     redirect_to('page_users.php');
 }
+$current_status = get_current_status($id);
+$statuses = ['online' => 'Онлайн', 'away' => 'Отошёл', 'not_disturb' => 'Не беспокоить']
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -47,9 +49,9 @@ if (!is_author($_SESSION['user']['id'], $id) && !is_admin()) {
                                         <div class="form-group">
                                             <label class="form-label" for="example-select">Выберите статус</label>
                                             <select name="status" class="form-control" id="example-select">
-                                                <option>Онлайн</option>
-                                                <option>Отошел</option>
-                                                <option>Не беспокоить</option>
+                                                <?php foreach ($statuses as $key => $value): ?>
+                                                    <option <?php if ($key === $current_status): ?>selected<?php endif; ?> value="<?php echo $key ?>"><?php echo $value?></option>
+                                                <?php endforeach; ?>
                                             </select>
                                         </div>
                                     </div>

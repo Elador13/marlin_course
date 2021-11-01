@@ -69,6 +69,11 @@ session_start();
                                             <strong>Уведомление! </strong><?php display_flash_message('user_exist'); ?>
                                         </div>
                                     <?php endif ?>
+                                    <?php if (isset($_SESSION['_flash']['delete'])): ?>
+                                        <div class="alert alert-success text-dark" role="alert">
+                                            <strong><?php display_flash_message('delete'); ?></strong>
+                                        </div>
+                                    <?php endif ?>
 
                                     <form id="js-login" novalidate="" action="register.php" method="post">
                                         <div class="form-group">

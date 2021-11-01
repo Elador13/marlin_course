@@ -56,7 +56,11 @@ $user = get_user_by_id($id);
                             </div>
                             <div class="panel-content">
                                 <div class="form-group">
-                                    <img src="img/avatars/<?php echo $user['avatar'] ?>" alt="" class="img-responsive" width="200">
+                                    <?php if (has_image($user['user_id'])): ?>
+                                        <img src="img/avatars/<?php echo $user['avatar'] ?>" alt="" class="img-responsive" width="200">
+                                    <?php else: ?>
+                                        <img src="img/avatars/no_avatar.png" alt="" class="img-responsive" width="200">
+                                    <?php endif; ?>
                                 </div>
 
                                 <div class="form-group">

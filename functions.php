@@ -91,7 +91,7 @@ function edit_user_info($id, $username = null, $job = null, $tel = null, $addres
     $statement->execute(array($username, $job, $tel, $address, $id));
 }
 
-function set_status($id, $status = 'Онлайн')
+function set_status($id, $status = 'online')
 {
     $pdo = new PDO('mysql:dbname=marlin_course;host=localhost;charset=utf8', 'root', 'root',
         [PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC]);
@@ -175,13 +175,13 @@ function get_all_users()
 function get_status_class($status)
 {
     switch ($status) {
-        case 'Не беспокоить':
+        case 'not_disturb':
             echo "status-danger";
             break;
-        case 'Отошел':
+        case 'away':
             echo "status-warning";
             break;
-        case 'Онлайн':
+        case 'online':
             echo "status-success";
             break;
     }
@@ -210,25 +210,24 @@ function can_upload($file){
     return true;
 }
 
-function upload_avatar($id)
+function upload_avatar($id, $image)
 {
-    if(!isset($_FILES['avatar'])) {
+    if(!isset($image)) {
         set_flash_message('avatar_error', 'Вы не выбрали изображение');
         redirect_to('page_avatar.php' . "?id=$id");
     }
     // Проверка можно ли загружать изображение
-    $check = can_upload($_FILES['avatar']);
-    $file = $_FILES['avatar'];
+    $check = can_upload($image);
 
     if($check === true){
         $old_avatar = get_user_by_id($id)['avatar'];
         //Удаляю старый аватар из БД и хранилища
-        if (file_exists("/img/avatars/$old_avatar/")) {
-            unlink("/img/avatars/$old_avatar/");
+        if (file_exists("img/avatars/$old_avatar")) {
+            unlink("img/avatars/$old_avatar");
         }
 
         //Создаю уникальное имя файла
-        $extension = pathinfo($file['name'], PATHINFO_EXTENSION);
+        $extension = pathinfo($image['name'], PATHINFO_EXTENSION);
         $name = uniqid() . '.' . $extension;
 
         $pdo = new PDO('mysql:dbname=marlin_course;host=localhost;charset=utf8', 'root', 'root',
@@ -236,7 +235,7 @@ function upload_avatar($id)
         $statement = $pdo->prepare("UPDATE users SET avatar = ? WHERE user_id = ?");
         $statement->execute(array($name, $id));
 
-        copy($file['tmp_name'], 'img/avatars/' . $name);
+        copy($image['tmp_name'], 'img/avatars/' . $name);
 
         set_flash_message('edit_success', 'Данные пользователья успешно изменены');
         return true;
@@ -249,5 +248,38 @@ function upload_avatar($id)
 function is_author($logged_user_id, $edit_user_id)
 {
     if ($logged_user_id != $edit_user_id) return false;
+    return true;
+}
+
+function get_current_status($id)
+{
+    $pdo = new PDO('mysql:dbname=marlin_course;host=localhost;charset=utf8', 'root', 'root',
+        [PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC]);
+
+    $statement = $pdo->query("SELECT status FROM users WHERE user_id = $id");
+    return $statement->fetch()['status'];
+}
+
+function has_image($user_id)
+{
+    $user = get_user_by_id($user_id);
+    if (isset($user['avatar']) && file_exists('img/avatars/' . $user['avatar'])) {
+        return true;
+    };
+    return false;
+}
+
+function logout()
+{
+    $_SESSION = array();
+    session_destroy();
+}
+
+function delete($user_id)
+{
+    $pdo = new PDO('mysql:dbname=marlin_course;host=localhost;charset=utf8', 'root', 'root',
+        [PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC]);
+
+    $statement = $pdo->query("DELETE FROM users WHERE user_id = $user_id");
     return true;
 }
